@@ -28,9 +28,126 @@
             padding: 40px;
             border-radius: 30px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
+            max-width: 800px;
             width: 90%;
             margin: auto;
+        }
+
+        /* Cat Chooser Styles */
+        .chooser-container {
+            width: 100%;
+        }
+
+        .chooser-title {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chooser-subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .cats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .cat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .cat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .cat-card.selected {
+            border-color: #52de97;
+            background: linear-gradient(135deg, rgba(82, 222, 151, 0.1), rgba(102, 126, 234, 0.1));
+            transform: scale(1.05);
+        }
+
+        .cat-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cat-card-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .cat-card-personality {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .cat-card-condition {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #52de97, #3ebd7f);
+            color: white;
+            padding: 18px 50px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(82, 222, 151, 0.4);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .start-button.enabled {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .start-button.enabled:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(82, 222, 151, 0.6);
+        }
+
+        .start-button.enabled:active {
+            transform: scale(0.95);
+        }
+
+        .game-container {
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
         }
 
         h1 {
@@ -316,10 +433,43 @@
 </head>
 <body>
     <div class="container">
-        <h1>🐱 Kitten Recovery Story</h1>
-        <p class="story-text">You found a poor kitten outside, dirty and weak. With your love and care, you can help it recover!</p>
+        <!-- Cat Chooser Screen -->
+        <div class="chooser-container" id="chooserContainer">
+            <h1 class="chooser-title">🐱 Choose Your Kitten to Rescue</h1>
+            <p class="chooser-subtitle">Each kitten needs your love and care. Select one to begin their recovery journey!</p>
 
-        <div class="stage-indicator">
+            <div class="cats-grid" id="catsGrid">
+                <div class="cat-card" data-cat="whiskers">
+                    <img src="kitten.webp" alt="Whiskers" class="cat-card-image" style="filter: brightness(0.7) sepia(0.3);">
+                    <div class="cat-card-name">🤍 Whiskers</div>
+                    <div class="cat-card-personality">Shy and gentle, found hiding in a box</div>
+                    <div class="cat-card-condition">Needs Care</div>
+                </div>
+
+                <div class="cat-card" data-cat="mittens">
+                    <img src="kitten.webp" alt="Mittens" class="cat-card-image" style="filter: brightness(0.6) saturate(0.7) hue-rotate(15deg);">
+                    <div class="cat-card-name">🧡 Mittens</div>
+                    <div class="cat-card-personality">Brave but weak, meowing for help</div>
+                    <div class="cat-card-condition">Needs Care</div>
+                </div>
+
+                <div class="cat-card" data-cat="shadow">
+                    <img src="kitten.webp" alt="Shadow" class="cat-card-image" style="filter: brightness(0.5) saturate(0.5);">
+                    <div class="cat-card-name">🖤 Shadow</div>
+                    <div class="cat-card-personality">Quiet and tired, needs warmth</div>
+                    <div class="cat-card-condition">Needs Care</div>
+                </div>
+            </div>
+
+            <button class="start-button" id="startButton">Start Recovery Journey 🚀</button>
+        </div>
+
+        <!-- Game Content -->
+        <div class="game-container" id="gameContainer">
+            <h1>🐱 Kitten Recovery Story</h1>
+            <p class="story-text">You found <span id="kittenName">a poor kitten</span> outside, dirty and weak. With your love and care, you can help it recover!</p>
+
+            <div class="stage-indicator">
             <div class="stage-dot" id="dot1"></div>
             <div class="stage-dot" id="dot2"></div>
             <div class="stage-dot" id="dot3"></div>
@@ -369,9 +519,67 @@
         </div>
 
         <div id="completeMessage" class="hidden"></div>
+        </div>
+        <!-- End Game Container -->
     </div>
 
     <script>
+        // Cat Chooser Logic
+        let selectedCat = null;
+        const catCards = document.querySelectorAll('.cat-card');
+        const startButton = document.getElementById('startButton');
+        const chooserContainer = document.getElementById('chooserContainer');
+        const gameContainer = document.getElementById('gameContainer');
+        const kittenNameSpan = document.getElementById('kittenName');
+
+        const catNames = {
+            'whiskers': 'Whiskers',
+            'mittens': 'Mittens',
+            'shadow': 'Shadow'
+        };
+
+        catCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                catCards.forEach(c => c.classList.remove('selected'));
+
+                // Select this card
+                this.classList.add('selected');
+                selectedCat = this.getAttribute('data-cat');
+
+                // Enable start button
+                startButton.classList.add('enabled');
+            });
+        });
+
+        startButton.addEventListener('click', function() {
+            if (selectedCat) {
+                // Update kitten name in story
+                kittenNameSpan.textContent = catNames[selectedCat];
+
+                // Fade out chooser and show game
+                chooserContainer.style.opacity = '0';
+                chooserContainer.style.transform = 'translateY(-20px)';
+
+                setTimeout(() => {
+                    chooserContainer.style.display = 'none';
+                    gameContainer.classList.add('active');
+                    gameContainer.style.opacity = '0';
+                    gameContainer.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        gameContainer.style.transition = 'all 0.5s ease';
+                        gameContainer.style.opacity = '1';
+                        gameContainer.style.transform = 'translateY(0)';
+                    }, 50);
+                }, 500);
+            }
+        });
+
+        // Add transition styles
+        chooserContainer.style.transition = 'all 0.5s ease';
+
+        // Game Logic
         let currentStage = 1;
         let cleanProgress = 0;
         let feedProgress = 0;
