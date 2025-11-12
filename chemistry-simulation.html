@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Chemistry Simulation</title>
+    <link rel="stylesheet" href="chemistry-simulation.css">
+</head>
+<body>
+    <div class="lab-container">
+        <h1 class="title">Chemistry Simulation Lab</h1>
+
+        <div class="instruction">Select two beakers to mix</div>
+
+        <div class="lab-table">
+            <div class="beaker-container" data-beaker="A">
+                <div class="beaker" id="beaker-A">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker A</div>
+                <div class="selection-indicator"></div>
+            </div>
+
+            <div class="beaker-container" data-beaker="B">
+                <div class="beaker" id="beaker-B">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker B</div>
+                <div class="selection-indicator"></div>
+            </div>
+
+            <div class="beaker-container" data-beaker="C">
+                <div class="beaker" id="beaker-C">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker C</div>
+                <div class="selection-indicator"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="mix-btn" class="btn btn-mix" disabled>Mix Selected Beakers</button>
+            <button id="reset-btn" class="btn btn-reset">Reset</button>
+        </div>
+
+        <div class="result-message" id="result-message"></div>
+
+        <!-- Particle container for energy burst effect -->
+        <div class="particle-container" id="particle-container"></div>
+    </div>
+
+    <script src="chemistry-simulation.js"></script>
+</body>
+</html>
