@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Bird Journey - Interactive Narrative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #FFF8DC 100%);
+            height: 100vh;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Intro Screen */
+        #intro {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            transition: opacity 0.8s;
+        }
+
+        #intro.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #intro h1 {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        #intro p {
+            font-size: 1.2rem;
+            color: #555;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            padding: 0 20px;
+        }
+
+        #startButton {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        #startButton:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Paper Bird */
+        #bird {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            transition: all 0.3s ease;
+            filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
+            z-index: 100;
+        }
+
+        #bird.flying {
+            animation: flutter 0.5s ease-in-out infinite;
+        }
+
+        #bird.grabbed {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        @keyframes flutter {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-5deg); }
+            75% { transform: translate(-50%, -50%) rotate(5deg); }
+        }
+
+        /* Mountain Destination */
+        #mountain {
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 300px;
+            height: 400px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #mountain:hover {
+            transform: scale(1.05);
+        }
+
+        .mountain-peak {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 300px solid #8B7355;
+        }
+
+        .mountain-snow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 80px solid transparent;
+            border-right: 80px solid transparent;
+            border-bottom: 100px solid #FFFFFF;
+        }
+
+        .mountain-label {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Ocean Destination */
+        #ocean {
+            position: absolute;
+            bottom: 0;
+            right: 10%;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            width: 400px;
+            height: 100px;
+            background: #4A90E2;
+            border-radius: 50%;
+            animation: wave-motion 3s ease-in-out infinite;
+        }
+
+        .wave:nth-child(1) {
+            animation-delay: 0s;
+            opacity: 0.7;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 1s;
+            opacity: 0.5;
+        }
+
+        @keyframes wave-motion {
+            0%, 100% { transform: translateX(-100px) translateY(0); }
+            50% { transform: translateX(0) translateY(-10px); }
+        }
+
+        .ocean-label {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* City Destination */
+        #city {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 300px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #city:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+
+        .building {
+            position: absolute;
+            bottom: 0;
+            background: #34495e;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .building:nth-child(1) {
+            left: 20px;
+            width: 60px;
+            height: 200px;
+        }
+
+        .building:nth-child(2) {
+            left: 100px;
+            width: 80px;
+            height: 250px;
+        }
+
+        .building:nth-child(3) {
+            left: 200px;
+            width: 70px;
+            height: 180px;
+        }
+
+        .building:nth-child(4) {
+            left: 290px;
+            width: 90px;
+            height: 220px;
+        }
+
+        .window {
+            position: absolute;
+            width: 8px;
+            height: 12px;
+            background: #2c3e50;
+            border-radius: 1px;
+            transition: background 0.3s;
+        }
+
+        .window.lit {
+            background: #f1c40f;
+            box-shadow: 0 0 10px #f1c40f;
+        }
+
+        .city-label {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #2c3e50;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        /* Outcome Modal */
+        #outcome {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+        }
+
+        #outcome.show {
+            display: flex;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .outcome-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .outcome-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .outcome-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+
+        #restartButton {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #restartButton:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        /* Sunlight effect */
+        .sunlight {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 223, 0, 0.6) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sunlight.show {
+            animation: sunlightAppear 2s ease-out forwards;
+        }
+
+        @keyframes sunlightAppear {
+            to {
+                opacity: 1;
+                transform: scale(2);
+            }
+        }
+
+        /* Instructions */
+        #instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-size: 1rem;
+            color: #2c3e50;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            max-width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Intro Screen -->
+        <div id="intro">
+            <h1>🕊️ The Paper Bird's Journey</h1>
+            <p>
+                A folded paper bird awaits its destiny. Three paths lie before it,
+                each representing a different journey through life. Where will you guide it?
+            </p>
+            <button id="startButton">Begin Journey</button>
+        </div>
+
+        <!-- Instructions -->
+        <div id="instructions">
+            Choose the bird's path: Click the ⛰ mountain, drag toward the 🌊 ocean, or click the 🌆 city
+        </div>
+
+        <!-- Paper Bird -->
+        <div id="bird">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Bird body -->
+                <polygon points="50,20 30,50 50,45 70,50" fill="#F5F5DC" stroke="#D3D3D3" stroke-width="1"/>
+                <!-- Bird wings -->
+                <polygon points="50,45 20,40 30,50" fill="#FAFAF0" stroke="#D3D3D3" stroke-width="1"/>
+                <polygon points="50,45 80,40 70,50" fill="#FAFAF0" stroke="#D3D3D3" stroke-width="1"/>
+                <!-- Bird tail -->
+                <polygon points="50,45 45,70 50,60 55,70" fill="#F5F5DC" stroke="#D3D3D3" stroke-width="1"/>
+            </svg>
+        </div>
+
+        <!-- Mountain Destination -->
+        <div id="mountain">
+            <div class="mountain-peak">
+                <div class="mountain-snow"></div>
+            </div>
+            <div class="mountain-label">⛰ Freedom</div>
+        </div>
+
+        <!-- Ocean Destination -->
+        <div id="ocean">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="ocean-label">🌊 Peace</div>
+        </div>
+
+        <!-- City Destination -->
+        <div id="city">
+            <div class="building">
+                <div class="window" style="top: 20px; left: 10px;"></div>
+                <div class="window" style="top: 20px; left: 25px;"></div>
+                <div class="window" style="top: 40px; left: 10px;"></div>
+                <div class="window" style="top: 40px; left: 25px;"></div>
+                <div class="window" style="top: 60px; left: 10px;"></div>
+                <div class="window" style="top: 60px; left: 25px;"></div>
+            </div>
+            <div class="building">
+                <div class="window" style="top: 20px; left: 15px;"></div>
+                <div class="window" style="top: 20px; left: 35px;"></div>
+                <div class="window" style="top: 40px; left: 15px;"></div>
+                <div class="window" style="top: 40px; left: 35px;"></div>
+                <div class="window" style="top: 60px; left: 15px;"></div>
+                <div class="window" style="top: 60px; left: 35px;"></div>
+                <div class="window" style="top: 80px; left: 15px;"></div>
+                <div class="window" style="top: 80px; left: 35px;"></div>
+            </div>
+            <div class="building">
+                <div class="window" style="top: 20px; left: 12px;"></div>
+                <div class="window" style="top: 20px; left: 28px;"></div>
+                <div class="window" style="top: 40px; left: 12px;"></div>
+                <div class="window" style="top: 40px; left: 28px;"></div>
+                <div class="window" style="top: 60px; left: 12px;"></div>
+                <div class="window" style="top: 60px; left: 28px;"></div>
+            </div>
+            <div class="building">
+                <div class="window" style="top: 20px; left: 15px;"></div>
+                <div class="window" style="top: 20px; left: 35px;"></div>
+                <div class="window" style="top: 40px; left: 15px;"></div>
+                <div class="window" style="top: 40px; left: 35px;"></div>
+                <div class="window" style="top: 60px; left: 15px;"></div>
+                <div class="window" style="top: 60px; left: 35px;"></div>
+                <div class="window" style="top: 80px; left: 15px;"></div>
+                <div class="window" style="top: 80px; left: 35px;"></div>
+            </div>
+            <div class="city-label">🌆 Connection</div>
+        </div>
+
+        <!-- Sunlight effect -->
+        <div class="sunlight"></div>
+
+        <!-- Outcome Modal -->
+        <div id="outcome">
+            <div class="outcome-content">
+                <h2 id="outcomeTitle"></h2>
+                <p id="outcomeText"></p>
+                <button id="restartButton">Journey Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let isDragging = false;
+        let hasChosen = false;
+
+        // Elements
+        const intro = document.getElementById('intro');
+        const startButton = document.getElementById('startButton');
+        const bird = document.getElementById('bird');
+        const mountain = document.getElementById('mountain');
+        const ocean = document.getElementById('ocean');
+        const city = document.getElementById('city');
+        const outcome = document.getElementById('outcome');
+        const outcomeTitle = document.getElementById('outcomeTitle');
+        const outcomeText = document.getElementById('outcomeText');
+        const restartButton = document.getElementById('restartButton');
+        const sunlight = document.querySelector('.sunlight');
+        const instructions = document.getElementById('instructions');
+
+        // Start the journey
+        startButton.addEventListener('click', () => {
+            intro.classList.add('hidden');
+            setTimeout(() => {
+                intro.style.display = 'none';
+                bird.classList.add('flying');
+            }, 800);
+        });
+
+        // Mountain path - Click to fly upward
+        mountain.addEventListener('click', () => {
+            if (hasChosen) return;
+            hasChosen = true;
+
+            instructions.style.display = 'none';
+            const mountainRect = mountain.getBoundingClientRect();
+            const targetX = mountainRect.left + mountainRect.width / 2;
+            const targetY = 100;
+
+            animateBirdTo(targetX, targetY, () => {
+                // Show sunlight
+                sunlight.style.left = targetX + 'px';
+                sunlight.style.top = targetY + 'px';
+                sunlight.classList.add('show');
+
+                // Fade out bird
+                bird.style.transition = 'all 2s ease-out';
+                bird.style.opacity = '0';
+                bird.style.transform = 'translate(-50%, -50%) scale(0.5)';
+
+                setTimeout(() => {
+                    showOutcome(
+                        'Freedom ⛰',
+                        'The paper bird soars higher and higher, disappearing into the warm sunlight. It has chosen the path of freedom, unbounded by earthly concerns, forever seeking new horizons above the clouds.'
+                    );
+                }, 2000);
+            });
+        });
+
+        // Ocean path - Drag toward ocean
+        let dragStartX, dragStartY;
+
+        bird.addEventListener('mousedown', startDrag);
+        bird.addEventListener('touchstart', startDrag);
+
+        function startDrag(e) {
+            if (hasChosen) return;
+            isDragging = true;
+            bird.classList.add('grabbed');
+            bird.classList.remove('flying');
+
+            const pos = getEventPosition(e);
+            dragStartX = pos.x;
+            dragStartY = pos.y;
+        }
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            const pos = getEventPosition(e);
+            bird.style.left = pos.x + 'px';
+            bird.style.top = pos.y + 'px';
+            bird.style.transition = 'none';
+        }
+
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function endDrag(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            bird.classList.remove('grabbed');
+
+            const pos = getEventPosition(e);
+            const oceanRect = ocean.getBoundingClientRect();
+
+            // Check if dropped near ocean
+            if (pos.x > oceanRect.left - 100 &&
+                pos.x < oceanRect.right + 100 &&
+                pos.y > oceanRect.top - 100) {
+
+                if (hasChosen) return;
+                hasChosen = true;
+                instructions.style.display = 'none';
+
+                // Animate to ocean surface
+                const targetX = oceanRect.left + oceanRect.width / 2;
+                const targetY = oceanRect.top + 50;
+
+                bird.style.transition = 'all 1.5s ease-out';
+                bird.style.left = targetX + 'px';
+                bird.style.top = targetY + 'px';
+                bird.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+
+                setTimeout(() => {
+                    showOutcome(
+                        'Peace 🌊',
+                        'The paper bird glides gracefully over the waves before gently landing on the calm water. It floats peacefully, embracing tranquility and the soothing rhythm of the tides. Here, it finds serenity.'
+                    );
+                }, 1500);
+            } else {
+                // Return to center if not dropped on ocean
+                bird.classList.add('flying');
+                bird.style.transition = 'all 0.5s ease-out';
+                bird.style.left = '50%';
+                bird.style.top = '50%';
+            }
+        }
+
+        // City path - Click to fly to city
+        city.addEventListener('click', () => {
+            if (hasChosen) return;
+            hasChosen = true;
+
+            instructions.style.display = 'none';
+            const cityRect = city.getBoundingClientRect();
+            const targetX = cityRect.left + cityRect.width / 2;
+            const targetY = cityRect.top + 100;
+
+            animateBirdTo(targetX, targetY, () => {
+                // Light up windows
+                const windows = city.querySelectorAll('.window');
+                windows.forEach((window, index) => {
+                    setTimeout(() => {
+                        window.classList.add('lit');
+                    }, index * 100);
+                });
+
+                // Transform bird into letter
+                setTimeout(() => {
+                    bird.style.transition = 'all 1s ease-out';
+                    bird.style.transform = 'translate(-50%, -50%) rotateX(90deg) scale(0.8)';
+
+                    setTimeout(() => {
+                        showOutcome(
+                            'Connection 🌆',
+                            'The paper bird folds itself into a letter and lands gently on a window sill. Inside, a human finds it and reads the message within. The bird has chosen connection, becoming a bridge between hearts and minds.'
+                        );
+                    }, 1000);
+                }, 500);
+            });
+        });
+
+        // Helper functions
+        function animateBirdTo(x, y, callback) {
+            bird.classList.remove('flying');
+            bird.style.transition = 'all 1.5s ease-in-out';
+            bird.style.left = x + 'px';
+            bird.style.top = y + 'px';
+
+            if (callback) {
+                setTimeout(callback, 1500);
+            }
+        }
+
+        function getEventPosition(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function showOutcome(title, text) {
+            outcomeTitle.textContent = title;
+            outcomeText.textContent = text;
+            outcome.classList.add('show');
+        }
+
+        // Restart button
+        restartButton.addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
