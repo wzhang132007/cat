@@ -10,7 +10,38 @@
     <div class="lab-container">
         <h1 class="title">Chemistry Simulation Lab</h1>
 
-        <div class="instruction">Select two beakers to mix</div>
+        <div class="instruction">Step 1: Select a solution and click a beaker to fill it | Step 2: Select two filled beakers to mix</div>
+
+        <!-- Solution Selection Panel -->
+        <div class="solution-panel">
+            <div class="solution-title">Available Solutions:</div>
+            <div class="solution-options">
+                <div class="solution-option" data-solution="acid">
+                    <div class="solution-preview acid"></div>
+                    <div class="solution-name">Acid</div>
+                </div>
+                <div class="solution-option" data-solution="base">
+                    <div class="solution-preview base"></div>
+                    <div class="solution-name">Base</div>
+                </div>
+                <div class="solution-option" data-solution="salt">
+                    <div class="solution-preview salt"></div>
+                    <div class="solution-name">Salt</div>
+                </div>
+                <div class="solution-option" data-solution="water">
+                    <div class="solution-preview water"></div>
+                    <div class="solution-name">Water</div>
+                </div>
+                <div class="solution-option" data-solution="organic">
+                    <div class="solution-preview organic"></div>
+                    <div class="solution-name">Organic</div>
+                </div>
+                <div class="solution-option" data-solution="indicator">
+                    <div class="solution-preview indicator"></div>
+                    <div class="solution-name">Indicator</div>
+                </div>
+            </div>
+        </div>
 
         <div class="lab-table">
             <div class="beaker-container" data-beaker="A">
@@ -23,6 +54,7 @@
                 </div>
                 <div class="label">Beaker A</div>
                 <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
             </div>
 
             <div class="beaker-container" data-beaker="B">
@@ -35,6 +67,7 @@
                 </div>
                 <div class="label">Beaker B</div>
                 <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
             </div>
 
             <div class="beaker-container" data-beaker="C">
@@ -47,6 +80,46 @@
                 </div>
                 <div class="label">Beaker C</div>
                 <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
+            </div>
+
+            <div class="beaker-container" data-beaker="D">
+                <div class="beaker" id="beaker-D">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker D</div>
+                <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
+            </div>
+
+            <div class="beaker-container" data-beaker="E">
+                <div class="beaker" id="beaker-E">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker E</div>
+                <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
+            </div>
+
+            <div class="beaker-container" data-beaker="F">
+                <div class="beaker" id="beaker-F">
+                    <div class="beaker-glass">
+                        <div class="liquid"></div>
+                        <div class="reflection"></div>
+                    </div>
+                    <div class="beaker-base"></div>
+                </div>
+                <div class="label">Beaker F</div>
+                <div class="selection-indicator"></div>
+                <div class="fill-indicator">Empty</div>
             </div>
         </div>
 

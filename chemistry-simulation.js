@@ -1,15 +1,36 @@
-// Chemistry Simulation Logic
+// Enhanced Chemistry Simulation with Solution Selection
 class ChemistrySimulation {
     constructor() {
+        this.selectedSolution = null;
         this.selectedBeakers = [];
+        this.beakerContents = {}; // Track what solution is in each beaker
         this.isAnimating = false;
-        this.reactions = ['energy-burst', 'color-reaction', 'no-reaction'];
+
+        // Define reaction outcomes based on solution combinations
+        this.reactionMatrix = {
+            'acid-base': ['neutralization', 'heat-release', 'color-change'],
+            'acid-salt': ['gas-release', 'color-change', 'no-reaction'],
+            'acid-water': ['dilution', 'heat-release', 'no-reaction'],
+            'acid-organic': ['esterification', 'color-change', 'energy-burst'],
+            'acid-indicator': ['color-change', 'color-change', 'color-change'],
+            'base-salt': ['precipitation', 'color-change', 'no-reaction'],
+            'base-water': ['dilution', 'heat-release', 'no-reaction'],
+            'base-organic': ['saponification', 'energy-burst', 'color-change'],
+            'base-indicator': ['color-change', 'color-change', 'color-change'],
+            'salt-water': ['dissolution', 'no-reaction', 'no-reaction'],
+            'salt-organic': ['no-reaction', 'separation', 'no-reaction'],
+            'salt-indicator': ['no-reaction', 'color-change', 'no-reaction'],
+            'water-organic': ['separation', 'no-reaction', 'no-reaction'],
+            'water-indicator': ['dilution', 'color-change', 'no-reaction'],
+            'organic-indicator': ['color-change', 'no-reaction', 'no-reaction'],
+        };
 
         this.init();
     }
 
     init() {
         this.beakerContainers = document.querySelectorAll('.beaker-container');
+        this.solutionOptions = document.querySelectorAll('.solution-option');
         this.mixBtn = document.getElementById('mix-btn');
         this.resetBtn = document.getElementById('reset-btn');
         this.resultMessage = document.getElementById('result-message');
@@ -19,9 +40,14 @@ class ChemistrySimulation {
     }
 
     attachEventListeners() {
-        // Beaker selection
+        // Solution selection
+        this.solutionOptions.forEach(option => {
+            option.addEventListener('click', () => this.selectSolution(option));
+        });
+
+        // Beaker clicking (for filling and selecting)
         this.beakerContainers.forEach(container => {
-            container.addEventListener('click', () => this.selectBeaker(container));
+            container.addEventListener('click', () => this.handleBeakerClick(container));
         });
 
         // Mix button
@@ -31,12 +57,71 @@ class ChemistrySimulation {
         this.resetBtn.addEventListener('click', () => this.reset());
     }
 
-    selectBeaker(container) {
+    selectSolution(option) {
+        if (this.isAnimating) return;
+
+        const solutionType = option.dataset.solution;
+
+        // Toggle selection
+        if (this.selectedSolution === solutionType) {
+            this.selectedSolution = null;
+            option.classList.remove('selected');
+        } else {
+            // Deselect all
+            this.solutionOptions.forEach(opt => opt.classList.remove('selected'));
+            // Select this one
+            this.selectedSolution = solutionType;
+            option.classList.add('selected');
+        }
+
+        this.updateInstructions();
+    }
+
+    handleBeakerClick(container) {
         if (this.isAnimating) return;
 
         const beakerName = container.dataset.beaker;
 
-        // Toggle selection
+        // If a solution is selected and beaker is empty, fill it
+        if (this.selectedSolution && !this.beakerContents[beakerName]) {
+            this.fillBeaker(container, beakerName);
+        }
+        // If beaker is filled, toggle selection for mixing
+        else if (this.beakerContents[beakerName]) {
+            this.toggleBeakerSelection(container, beakerName);
+        }
+    }
+
+    async fillBeaker(container, beakerName) {
+        // Fill the beaker with selected solution
+        this.beakerContents[beakerName] = this.selectedSolution;
+
+        const liquid = container.querySelector('.liquid');
+        const fillIndicator = container.querySelector('.fill-indicator');
+
+        // Add solution class to liquid
+        liquid.className = `liquid ${this.selectedSolution}`;
+
+        // Animate pour
+        container.classList.add('pouring');
+        container.classList.add('filled');
+
+        // Update fill indicator
+        fillIndicator.textContent = this.capitalize(this.selectedSolution);
+
+        await this.delay(500);
+
+        container.classList.remove('pouring');
+
+        // Deselect the solution after filling
+        this.solutionOptions.forEach(opt => opt.classList.remove('selected'));
+        this.selectedSolution = null;
+
+        this.updateInstructions();
+    }
+
+    toggleBeakerSelection(container, beakerName) {
+        // Toggle selection for mixing
         if (this.selectedBeakers.includes(beakerName)) {
             // Deselect
             this.selectedBeakers = this.selectedBeakers.filter(b => b !== beakerName);
@@ -54,15 +139,19 @@ class ChemistrySimulation {
 
     updateUI() {
         // Enable/disable mix button
-        this.mixBtn.disabled = this.selectedBeakers.length !== 2;
+        const canMix = this.selectedBeakers.length === 2 &&
+                       this.selectedBeakers.every(b => this.beakerContents[b]);
+        this.mixBtn.disabled = !canMix;
 
         // Update beaker states
         this.beakerContainers.forEach(container => {
             const beakerName = container.dataset.beaker;
 
-            if (this.selectedBeakers.length === 2 && !this.selectedBeakers.includes(beakerName)) {
+            // Disable beakers that can't be selected
+            if (this.selectedBeakers.length === 2 &&
+                !this.selectedBeakers.includes(beakerName)) {
                 container.classList.add('disabled');
-            } else {
+            } else if (this.beakerContents[beakerName]) {
                 container.classList.remove('disabled');
             }
         });
@@ -70,6 +159,15 @@ class ChemistrySimulation {
         // Clear result message when selection changes
         if (this.selectedBeakers.length !== 2) {
             this.resultMessage.textContent = '';
+        }
+    }
+
+    updateInstructions() {
+        const instruction = document.querySelector('.instruction');
+        if (this.selectedSolution) {
+            instruction.textContent = 'Click an empty beaker to fill it with ' + this.capitalize(this.selectedSolution);
+        } else {
+            instruction.textContent = 'Step 1: Select a solution and click a beaker to fill it | Step 2: Select two filled beakers to mix';
         }
     }
 
@@ -83,6 +181,10 @@ class ChemistrySimulation {
         const selectedContainers = Array.from(this.beakerContainers).filter(
             container => this.selectedBeakers.includes(container.dataset.beaker)
         );
+
+        // Get solution types
+        const solution1 = this.beakerContents[this.selectedBeakers[0]];
+        const solution2 = this.beakerContents[this.selectedBeakers[1]];
 
         // Show mixing animation
         selectedContainers.forEach(container => {
@@ -98,8 +200,8 @@ class ChemistrySimulation {
 
         await this.delay(100);
 
-        // Randomly select a reaction
-        const reaction = this.getRandomReaction();
+        // Get reaction based on solution combination
+        const reaction = this.getReactionForCombination(solution1, solution2);
 
         // Trigger the reaction
         await this.triggerReaction(reaction, selectedContainers);
@@ -107,32 +209,47 @@ class ChemistrySimulation {
         this.isAnimating = false;
     }
 
-    getRandomReaction() {
-        const randomIndex = Math.floor(Math.random() * this.reactions.length);
-        return this.reactions[randomIndex];
+    getReactionForCombination(sol1, sol2) {
+        // Sort solutions alphabetically to match matrix keys
+        const sorted = [sol1, sol2].sort();
+        const key = sorted.join('-');
+
+        // Get possible reactions for this combination
+        const possibleReactions = this.reactionMatrix[key] || ['no-reaction', 'no-reaction', 'no-reaction'];
+
+        // Randomly select one
+        const randomIndex = Math.floor(Math.random() * possibleReactions.length);
+        return possibleReactions[randomIndex];
     }
 
     async triggerReaction(reaction, containers) {
-        switch (reaction) {
-            case 'energy-burst':
-                await this.energyBurstReaction(containers);
-                break;
-            case 'color-reaction':
-                await this.colorReaction(containers);
-                break;
-            case 'no-reaction':
-                await this.noReaction(containers);
-                break;
-        }
+        // Map reaction types to visual effects
+        const reactionEffects = {
+            'neutralization': () => this.colorReaction(containers, 'Neutralization Reaction!'),
+            'heat-release': () => this.energyBurstReaction(containers, 'Exothermic Reaction - Heat Released!'),
+            'color-change': () => this.colorReaction(containers, 'Color Change Observed!'),
+            'gas-release': () => this.energyBurstReaction(containers, 'Gas Evolution Detected!'),
+            'dilution': () => this.noReaction(containers, 'Dilution - No Reaction'),
+            'esterification': () => this.colorReaction(containers, 'Ester Formation!'),
+            'precipitation': () => this.colorReaction(containers, 'Precipitate Formed!'),
+            'saponification': () => this.energyBurstReaction(containers, 'Soap Formation!'),
+            'dissolution': () => this.noReaction(containers, 'Solution Formed'),
+            'separation': () => this.noReaction(containers, 'Phase Separation'),
+            'no-reaction': () => this.noReaction(containers, 'No Significant Reaction'),
+            'energy-burst': () => this.energyBurstReaction(containers, 'Vigorous Reaction!')
+        };
+
+        const effectFunction = reactionEffects[reaction] || reactionEffects['no-reaction'];
+        await effectFunction();
     }
 
-    async energyBurstReaction(containers) {
+    async energyBurstReaction(containers, message) {
         // Add energy burst class
         containers.forEach(container => {
             container.classList.add('energy-burst');
         });
 
-        // Create particle burst effect from the center of both beakers
+        // Create particle burst effect
         containers.forEach(container => {
             const rect = container.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -141,46 +258,43 @@ class ChemistrySimulation {
             this.createParticleBurst(centerX, centerY, 20);
         });
 
-        this.resultMessage.textContent = '⚡ Energy Burst Detected!';
+        this.resultMessage.textContent = message;
         this.resultMessage.style.color = '#f39c12';
 
         await this.delay(600);
 
-        // Remove animation class
         containers.forEach(container => {
             container.classList.remove('energy-burst');
         });
     }
 
-    async colorReaction(containers) {
+    async colorReaction(containers, message) {
         // Add color reaction class
         containers.forEach(container => {
             container.classList.add('color-reaction');
         });
 
-        this.resultMessage.textContent = '🌈 Color Reaction Observed!';
+        this.resultMessage.textContent = message;
         this.resultMessage.style.color = '#9b59b6';
 
         await this.delay(600);
 
-        // Remove animation class
         containers.forEach(container => {
             container.classList.remove('color-reaction');
         });
     }
 
-    async noReaction(containers) {
+    async noReaction(containers, message) {
         // Add no reaction class
         containers.forEach(container => {
             container.classList.add('no-reaction');
         });
 
-        this.resultMessage.textContent = '○ No Significant Reaction';
+        this.resultMessage.textContent = message;
         this.resultMessage.style.color = '#95a5a6';
 
         await this.delay(500);
 
-        // Remove animation class
         containers.forEach(container => {
             container.classList.remove('no-reaction');
         });
@@ -191,7 +305,6 @@ class ChemistrySimulation {
             const particle = document.createElement('div');
             particle.classList.add('particle');
 
-            // Random angle and distance
             const angle = (Math.PI * 2 * i) / particleCount;
             const distance = 80 + Math.random() * 40;
             const tx = Math.cos(angle) * distance;
@@ -202,7 +315,6 @@ class ChemistrySimulation {
             particle.style.setProperty('--tx', `${tx}px`);
             particle.style.setProperty('--ty', `${ty}px`);
 
-            // Random colors for variety
             const colors = [
                 'radial-gradient(circle, #ffd700 0%, #ff6b6b 100%)',
                 'radial-gradient(circle, #ff6b6b 0%, #ff8c42 100%)',
@@ -213,7 +325,6 @@ class ChemistrySimulation {
 
             this.particleContainer.appendChild(particle);
 
-            // Remove particle after animation
             setTimeout(() => {
                 particle.remove();
             }, 600);
@@ -223,12 +334,24 @@ class ChemistrySimulation {
     reset() {
         if (this.isAnimating) return;
 
-        // Clear selections
+        // Clear all selections
+        this.selectedSolution = null;
         this.selectedBeakers = [];
+        this.beakerContents = {};
 
-        // Remove all classes from beakers
+        // Remove all classes from solution options
+        this.solutionOptions.forEach(opt => opt.classList.remove('selected'));
+
+        // Remove all classes from beakers and reset liquids
         this.beakerContainers.forEach(container => {
-            container.classList.remove('selected', 'disabled', 'mixing', 'energy-burst', 'color-reaction', 'no-reaction');
+            container.classList.remove('selected', 'disabled', 'mixing', 'energy-burst',
+                                       'color-reaction', 'no-reaction', 'pouring', 'filled');
+
+            const liquid = container.querySelector('.liquid');
+            liquid.className = 'liquid';
+
+            const fillIndicator = container.querySelector('.fill-indicator');
+            fillIndicator.textContent = 'Empty';
         });
 
         // Clear result message
@@ -239,6 +362,11 @@ class ChemistrySimulation {
 
         // Update UI
         this.updateUI();
+        this.updateInstructions();
+    }
+
+    capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
     delay(ms) {
