@@ -316,6 +316,141 @@ body {
     pointer-events: none;
 }
 
+/* Result Zone */
+.result-zone {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    min-height: 200px;
+}
+
+.result-zone-title {
+    font-size: 1rem;
+    color: #34495e;
+    margin-bottom: 20px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.result-beakers {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 40px;
+    flex-wrap: wrap;
+    min-height: 120px;
+}
+
+.result-placeholder {
+    color: #95a5a6;
+    font-size: 0.95rem;
+    font-style: italic;
+    padding: 40px;
+}
+
+.result-beaker-container {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    animation: appear 0.5s ease-out;
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.result-beaker-container:hover {
+    transform: translateY(-5px);
+}
+
+.result-beaker-container.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.result-beaker-container.selected .selection-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.result-beaker-container .beaker {
+    width: 120px;
+    height: 180px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.result-beaker-container .label {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #34495e;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Explosion animation for result beaker */
+.result-beaker-container.exploding .beaker-glass {
+    animation: explosion 0.8s ease-out;
+}
+
+@keyframes explosion {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.8;
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* Color change animation for result beaker */
+.result-beaker-container.color-changing .liquid {
+    animation: result-color-shift 1s ease-in-out;
+}
+
+@keyframes result-color-shift {
+    0%, 100% {
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    25% {
+        filter: hue-rotate(90deg) brightness(1.3);
+    }
+    50% {
+        filter: hue-rotate(180deg) brightness(1.5);
+    }
+    75% {
+        filter: hue-rotate(270deg) brightness(1.3);
+    }
+}
+
+/* Transfer animation particles */
+.transfer-particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999;
+}
+
 .controls {
     display: flex;
     justify-content: center;
