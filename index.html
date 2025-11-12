@@ -105,27 +105,38 @@
                 #87CEEB 40%,
                 #6B8E9F 70%,
                 #8B7355 100%);
+            overflow: hidden;
         }
 
         .mountain-scene {
             position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
+            left: 0;
+            width: 300%;
             height: 80%;
+            animation: scrollLeft 8s linear infinite;
         }
 
         .mountain-large {
             position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 40vw solid transparent;
             border-right: 40vw solid transparent;
             border-bottom: 70vh solid #8B7355;
+        }
+
+        .mountain-large:nth-child(1) {
+            left: 10%;
+        }
+
+        .mountain-large:nth-child(2) {
+            left: 50%;
+        }
+
+        .mountain-large:nth-child(3) {
+            left: 110%;
         }
 
         .mountain-snow-large {
@@ -158,6 +169,11 @@
             50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
         }
 
+        @keyframes scrollLeft {
+            from { transform: translateX(0); }
+            to { transform: translateX(-33.333%); }
+        }
+
         /* Ocean Episode */
         #oceanEpisode {
             background: linear-gradient(to bottom,
@@ -165,18 +181,20 @@
                 #4A90E2 40%,
                 #2E5F8F 70%,
                 #1E3A5F 100%);
+            overflow: hidden;
         }
 
         .ocean-scene {
             position: absolute;
-            width: 100%;
+            width: 300%;
             height: 100%;
+            animation: scrollLeft 10s linear infinite;
         }
 
         .wave-large {
             position: absolute;
             bottom: 0;
-            width: 200%;
+            width: 100%;
             height: 150px;
             background: #3A7BC8;
             border-radius: 50%;
@@ -186,37 +204,40 @@
         .wave-large:nth-child(1) {
             animation-delay: 0s;
             opacity: 0.8;
+            left: 0;
         }
 
         .wave-large:nth-child(2) {
             animation-delay: 1.3s;
             opacity: 0.6;
             height: 130px;
+            left: 33.333%;
         }
 
         .wave-large:nth-child(3) {
             animation-delay: 2.6s;
             opacity: 0.4;
             height: 110px;
+            left: 66.666%;
         }
 
         @keyframes wave-motion-large {
-            0%, 100% { transform: translateX(-25%) translateY(0); }
-            50% { transform: translateX(0) translateY(-20px); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
         .clouds {
             position: absolute;
             top: 20%;
-            width: 100%;
+            width: 300%;
             height: 30%;
+            animation: scrollLeftSlow 15s linear infinite;
         }
 
         .cloud {
             position: absolute;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 100px;
-            animation: float 20s linear infinite;
         }
 
         .cloud::before,
@@ -231,7 +252,7 @@
             width: 100px;
             height: 40px;
             top: 20px;
-            left: -100px;
+            left: 20%;
         }
 
         .cloud1::before {
@@ -252,8 +273,7 @@
             width: 120px;
             height: 50px;
             top: 80px;
-            left: -120px;
-            animation-delay: 10s;
+            left: 60%;
         }
 
         .cloud2::before {
@@ -270,9 +290,30 @@
             right: 15px;
         }
 
-        @keyframes float {
+        .cloud3 {
+            width: 110px;
+            height: 45px;
+            top: 50px;
+            left: 140%;
+        }
+
+        .cloud3::before {
+            width: 55px;
+            height: 55px;
+            top: -28px;
+            left: 12px;
+        }
+
+        .cloud3::after {
+            width: 65px;
+            height: 45px;
+            top: -18px;
+            right: 12px;
+        }
+
+        @keyframes scrollLeftSlow {
             from { transform: translateX(0); }
-            to { transform: translateX(calc(100vw + 150px)); }
+            to { transform: translateX(-33.333%); }
         }
 
         /* City Episode */
@@ -281,16 +322,18 @@
                 #1a1a2e 0%,
                 #16213e 50%,
                 #0f3460 100%);
+            overflow: hidden;
         }
 
         .city-scene {
             position: absolute;
             bottom: 0;
-            width: 100%;
+            width: 300%;
             height: 70%;
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: flex-end;
+            animation: scrollLeft 12s linear infinite;
         }
 
         .building-large {
@@ -735,6 +778,12 @@
                 <div class="mountain-large">
                     <div class="mountain-snow-large"></div>
                 </div>
+                <div class="mountain-large">
+                    <div class="mountain-snow-large"></div>
+                </div>
+                <div class="mountain-large">
+                    <div class="mountain-snow-large"></div>
+                </div>
             </div>
         </div>
 
@@ -743,6 +792,7 @@
             <div class="clouds">
                 <div class="cloud cloud1"></div>
                 <div class="cloud cloud2"></div>
+                <div class="cloud cloud3"></div>
             </div>
             <div class="ocean-scene">
                 <div class="wave-large"></div>
@@ -819,28 +869,31 @@
         });
 
         function animateBirdInMountain() {
-            // Bird starts from bottom center
-            bird.style.transition = 'all 2s ease-out';
-            bird.style.left = '50%';
-            bird.style.top = '70%';
+            // Bird starts from left side
+            bird.style.transition = 'all 0.5s ease-out';
+            bird.style.left = '10%';
+            bird.style.top = '60%';
+            bird.style.opacity = '1';
 
             setTimeout(() => {
-                // Bird spirals upward
+                // Bird flies right and up
                 bird.style.transition = 'all 3s ease-in-out';
-                bird.style.left = '60%';
-                bird.style.top = '40%';
+                bird.style.left = '40%';
+                bird.style.top = '45%';
             }, 500);
 
             setTimeout(() => {
-                bird.style.left = '40%';
-                bird.style.top = '20%';
-            }, 2000);
+                // Continue flying right and higher
+                bird.style.transition = 'all 3s ease-in-out';
+                bird.style.left = '70%';
+                bird.style.top = '30%';
+            }, 2500);
 
             setTimeout(() => {
-                // Bird disappears into sunlight
-                bird.style.transition = 'all 2s ease-out';
-                bird.style.left = '50%';
-                bird.style.top = '10%';
+                // Bird flies to upper right and disappears
+                bird.style.transition = 'all 2.5s ease-out';
+                bird.style.left = '90%';
+                bird.style.top = '15%';
                 bird.style.opacity = '0';
                 bird.style.transform = 'translate(-50%, -50%) scale(0.3)';
 
@@ -850,7 +903,7 @@
                         'The paper bird soars higher and higher, disappearing into the warm sunlight. It has chosen the path of freedom, unbounded by earthly concerns, forever seeking new horizons above the clouds.'
                     );
                 }, 2000);
-            }, 3500);
+            }, 4500);
         }
 
         // Ocean path - Drag toward ocean
@@ -918,30 +971,36 @@
         }
 
         function animateBirdInOcean() {
-            // Bird glides from right to left
-            bird.style.transition = 'all 2s ease-in-out';
-            bird.style.left = '80%';
-            bird.style.top = '30%';
+            // Bird starts from left, flies right
+            bird.style.transition = 'all 0.5s ease-out';
+            bird.style.left = '10%';
+            bird.style.top = '35%';
             bird.style.opacity = '1';
 
             setTimeout(() => {
-                bird.style.transition = 'all 3s ease-in-out';
-                bird.style.left = '20%';
-                bird.style.top = '35%';
-            }, 1000);
+                // Bird glides to the right
+                bird.style.transition = 'all 3.5s ease-in-out';
+                bird.style.left = '45%';
+                bird.style.top = '40%';
+            }, 500);
 
             setTimeout(() => {
-                // Bird descends toward water
-                bird.style.transition = 'all 2s ease-out';
-                bird.style.left = '50%';
-                bird.style.top = '60%';
-                bird.style.transform = 'translate(-50%, -50%) rotate(0deg) scale(0.9)';
+                // Continue gliding right
+                bird.style.transition = 'all 3.5s ease-in-out';
+                bird.style.left = '80%';
+                bird.style.top = '45%';
             }, 3000);
 
             setTimeout(() => {
+                // Bird descends toward water while moving right
+                bird.style.transition = 'all 2.5s ease-out';
+                bird.style.left = '95%';
+                bird.style.top = '65%';
+                bird.style.transform = 'translate(-50%, -50%) rotate(0deg) scale(0.9)';
+            }, 5500);
+
+            setTimeout(() => {
                 // Bird lands on water
-                bird.style.transition = 'all 1s ease-out';
-                bird.style.top = '70%';
                 bird.classList.remove('flying');
 
                 setTimeout(() => {
@@ -949,8 +1008,8 @@
                         'Peace 🌊',
                         'The paper bird glides gracefully over the waves before gently landing on the calm water. It floats peacefully, embracing tranquility and the soothing rhythm of the tides. Here, it finds serenity.'
                     );
-                }, 1500);
-            }, 5000);
+                }, 1000);
+            }, 7500);
         }
 
         // City path - Click to fly to city
@@ -969,33 +1028,41 @@
 
         function animateBirdInCity() {
             // Bird enters from left
-            bird.style.transition = 'all 2s ease-in-out';
-            bird.style.left = '20%';
-            bird.style.top = '30%';
+            bird.style.transition = 'all 0.5s ease-out';
+            bird.style.left = '10%';
+            bird.style.top = '35%';
             bird.style.opacity = '1';
 
             // Light up windows gradually
             setTimeout(() => {
                 lightUpCityWindows();
+            }, 500);
+
+            setTimeout(() => {
+                // Bird flies through city left to right
+                bird.style.transition = 'all 3s ease-in-out';
+                bird.style.left = '35%';
+                bird.style.top = '42%';
             }, 1000);
 
             setTimeout(() => {
-                // Bird weaves through buildings
-                bird.style.transition = 'all 2.5s ease-in-out';
-                bird.style.left = '70%';
-                bird.style.top = '40%';
-            }, 1500);
-
-            setTimeout(() => {
-                bird.style.transition = 'all 2s ease-in-out';
-                bird.style.left = '50%';
-                bird.style.top = '55%';
+                // Continue flying right, weaving up
+                bird.style.transition = 'all 3s ease-in-out';
+                bird.style.left = '60%';
+                bird.style.top = '38%';
             }, 3500);
 
             setTimeout(() => {
-                // Bird lands on building window
-                bird.style.transition = 'all 1.5s ease-out';
+                // Flying toward right side
+                bird.style.transition = 'all 2.5s ease-in-out';
+                bird.style.left = '85%';
                 bird.style.top = '45%';
+            }, 6000);
+
+            setTimeout(() => {
+                // Bird lands on building window at right
+                bird.style.transition = 'all 1.5s ease-out';
+                bird.style.left = '90%';
                 bird.style.transform = 'translate(-50%, -50%) rotateX(90deg) scale(0.7)';
                 bird.classList.remove('flying');
 
@@ -1005,7 +1072,7 @@
                         'The paper bird folds itself into a letter and lands gently on a window sill. Inside, a human finds it and reads the message within. The bird has chosen connection, becoming a bridge between hearts and minds.'
                     );
                 }, 1500);
-            }, 5500);
+            }, 8000);
         }
 
         function lightUpCityWindows() {
@@ -1041,9 +1108,10 @@
 
         function initializeCityScene() {
             const cityScene = document.getElementById('citySceneLarge');
-            const buildingHeights = [350, 450, 300, 500, 380];
-            const buildingWidths = [120, 150, 100, 180, 130];
+            const buildingHeights = [350, 450, 300, 500, 380, 420, 320, 480, 360, 440, 310, 490, 370, 430, 340];
+            const buildingWidths = [120, 150, 100, 180, 130, 140, 110, 170, 125, 160, 105, 175, 135, 155, 115];
 
+            // Create 3 sets of buildings for seamless scrolling
             buildingHeights.forEach((height, index) => {
                 const building = document.createElement('div');
                 building.className = 'building-large';
