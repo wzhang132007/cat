@@ -13,18 +13,28 @@ class ChemistrySimulation {
             'acid-base': ['neutralization', 'heat-release', 'color-change'],
             'acid-salt': ['gas-release', 'color-change', 'no-reaction'],
             'acid-water': ['dilution', 'heat-release', 'no-reaction'],
-            'acid-organic': ['esterification', 'color-change', 'energy-burst'],
-            'acid-indicator': ['color-change', 'color-change', 'color-change'],
+            'acid-oxygen': ['oxidation', 'color-change', 'no-reaction'],
+            'acid-hydrogen': ['reduction', 'gas-release', 'no-reaction'],
             'base-salt': ['precipitation', 'color-change', 'no-reaction'],
             'base-water': ['dilution', 'heat-release', 'no-reaction'],
-            'base-organic': ['saponification', 'energy-burst', 'color-change'],
-            'base-indicator': ['color-change', 'color-change', 'color-change'],
+            'base-oxygen': ['oxidation', 'color-change', 'no-reaction'],
+            'base-hydrogen': ['reduction', 'no-reaction', 'gas-release'],
             'salt-water': ['dissolution', 'no-reaction', 'no-reaction'],
-            'salt-organic': ['no-reaction', 'separation', 'no-reaction'],
-            'salt-indicator': ['no-reaction', 'color-change', 'no-reaction'],
-            'water-organic': ['separation', 'no-reaction', 'no-reaction'],
-            'water-indicator': ['dilution', 'color-change', 'no-reaction'],
-            'organic-indicator': ['color-change', 'no-reaction', 'no-reaction'],
+            'salt-oxygen': ['no-reaction', 'oxidation', 'no-reaction'],
+            'salt-hydrogen': ['no-reaction', 'reduction', 'no-reaction'],
+            'water-oxygen': ['dissolution', 'no-reaction', 'no-reaction'],
+            'water-hydrogen': ['dissolution', 'no-reaction', 'no-reaction'],
+            'hydrogen-oxygen': ['explosive-combustion', 'explosive-combustion', 'explosive-combustion'],
+            // Keep old names as aliases
+            'acid-organic': ['oxidation', 'color-change', 'no-reaction'],
+            'acid-indicator': ['reduction', 'gas-release', 'no-reaction'],
+            'base-organic': ['oxidation', 'color-change', 'no-reaction'],
+            'base-indicator': ['reduction', 'no-reaction', 'gas-release'],
+            'salt-organic': ['no-reaction', 'oxidation', 'no-reaction'],
+            'salt-indicator': ['no-reaction', 'reduction', 'no-reaction'],
+            'water-organic': ['dissolution', 'no-reaction', 'no-reaction'],
+            'water-indicator': ['dissolution', 'no-reaction', 'no-reaction'],
+            'organic-indicator': ['explosive-combustion', 'explosive-combustion', 'explosive-combustion'],
         };
 
         this.init();
@@ -281,11 +291,46 @@ class ChemistrySimulation {
             'dissolution': () => this.noReaction(containers, 'Solution Formed'),
             'separation': () => this.noReaction(containers, 'Phase Separation'),
             'no-reaction': () => this.noReaction(containers, 'No Significant Reaction'),
-            'energy-burst': () => this.energyBurstReaction(containers, 'Vigorous Reaction!')
+            'energy-burst': () => this.energyBurstReaction(containers, 'Vigorous Reaction!'),
+            'oxidation': () => this.colorReaction(containers, 'Oxidation Reaction!'),
+            'reduction': () => this.colorReaction(containers, 'Reduction Reaction!'),
+            'explosive-combustion': () => this.explosiveCombustion(containers)
         };
 
         const effectFunction = reactionEffects[reaction] || reactionEffects['no-reaction'];
         await effectFunction();
+    }
+
+    async explosiveCombustion(containers) {
+        // Special dramatic explosion for hydrogen + oxygen
+        containers.forEach(container => {
+            container.classList.add('energy-burst');
+        });
+
+        // Create massive particle burst
+        containers.forEach(container => {
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // More particles for a bigger explosion
+            this.createParticleBurst(centerX, centerY, 40);
+        });
+
+        this.resultMessage.textContent = '💥💥💥 EXPLOSIVE COMBUSTION - H₂ + O₂ → H₂O + ENERGY! 💥💥💥';
+        this.resultMessage.style.color = '#e74c3c';
+        this.resultMessage.style.fontWeight = 'bold';
+        this.resultMessage.style.fontSize = '1.4rem';
+
+        await this.delay(800);
+
+        containers.forEach(container => {
+            container.classList.remove('energy-burst');
+        });
+
+        // Reset message styling
+        this.resultMessage.style.fontWeight = '400';
+        this.resultMessage.style.fontSize = '1.2rem';
     }
 
     async energyBurstReaction(containers, message) {
@@ -486,17 +531,20 @@ class ChemistrySimulation {
         // Determine result color based on reaction type
         const reactionColorMap = {
             'neutralization': 'water',
-            'heat-release': 'organic',
-            'color-change': 'indicator',
+            'heat-release': 'oxygen',
+            'color-change': 'hydrogen',
             'gas-release': 'base',
             'dilution': 'water',
-            'esterification': 'organic',
+            'esterification': 'oxygen',
             'precipitation': 'salt',
             'saponification': 'base',
             'dissolution': 'water',
-            'separation': 'organic',
+            'separation': 'oxygen',
             'no-reaction': 'water',
-            'energy-burst': 'acid'
+            'energy-burst': 'acid',
+            'oxidation': 'oxygen',
+            'reduction': 'hydrogen',
+            'explosive-combustion': 'water'  // H2 + O2 -> H2O
         };
 
         return reactionColorMap[reaction] || 'water';
@@ -504,10 +552,31 @@ class ChemistrySimulation {
 
     async triggerResultReaction(reaction, beakerContainer) {
         // Determine if it should explode or color change
-        const explosiveReactions = ['energy-burst', 'gas-release', 'heat-release', 'saponification'];
-        const colorChangeReactions = ['color-change', 'neutralization', 'esterification', 'precipitation'];
+        const explosiveReactions = ['energy-burst', 'gas-release', 'heat-release', 'saponification', 'explosive-combustion'];
+        const colorChangeReactions = ['color-change', 'neutralization', 'esterification', 'precipitation', 'oxidation', 'reduction'];
 
-        if (explosiveReactions.includes(reaction)) {
+        if (reaction === 'explosive-combustion') {
+            // MASSIVE explosion for hydrogen + oxygen
+            beakerContainer.classList.add('exploding');
+
+            // Create HUGE particle burst
+            const rect = beakerContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            this.createParticleBurst(centerX, centerY, 50);
+
+            this.resultMessage.textContent = '💥💥💥 EXPLOSIVE COMBUSTION - Water Formed with MASSIVE Energy Release! 💥💥💥';
+            this.resultMessage.style.color = '#e74c3c';
+            this.resultMessage.style.fontWeight = 'bold';
+            this.resultMessage.style.fontSize = '1.4rem';
+
+            await this.delay(1200);
+            beakerContainer.classList.remove('exploding');
+
+            // Reset message styling
+            this.resultMessage.style.fontWeight = '400';
+            this.resultMessage.style.fontSize = '1.2rem';
+        } else if (explosiveReactions.includes(reaction)) {
             // Explosion animation
             beakerContainer.classList.add('exploding');
 
@@ -526,7 +595,16 @@ class ChemistrySimulation {
             // Color change animation
             beakerContainer.classList.add('color-changing');
 
-            this.resultMessage.textContent = '🌈 Solution Color Changing!';
+            const messages = {
+                'oxidation': '🔥 Oxidation Reaction - Oxygen Transfer!',
+                'reduction': '⚡ Reduction Reaction - Electron Transfer!',
+                'color-change': '🌈 Solution Color Changing!',
+                'neutralization': '○ Neutralization Complete!',
+                'esterification': '🧪 Ester Formation!',
+                'precipitation': '⬇️ Precipitate Formed!'
+            };
+
+            this.resultMessage.textContent = messages[reaction] || '🌈 Solution Color Changing!';
             this.resultMessage.style.color = '#9b59b6';
 
             await this.delay(1000);

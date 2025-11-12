@@ -112,12 +112,14 @@ body {
     background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(150, 200, 240, 0.4));
 }
 
+.solution-preview.oxygen,
 .solution-preview.organic {
-    background: linear-gradient(to bottom, rgba(255, 220, 50, 0.5), rgba(200, 150, 0, 0.6));
+    background: linear-gradient(to bottom, rgba(100, 200, 255, 0.4), rgba(50, 150, 255, 0.5));
 }
 
+.solution-preview.hydrogen,
 .solution-preview.indicator {
-    background: linear-gradient(to bottom, rgba(200, 50, 255, 0.5), rgba(150, 0, 200, 0.6));
+    background: linear-gradient(to bottom, rgba(255, 200, 255, 0.4), rgba(220, 150, 255, 0.5));
 }
 
 .solution-name {
@@ -272,12 +274,14 @@ body {
     background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(150, 200, 240, 0.4));
 }
 
+.liquid.oxygen,
 .liquid.organic {
-    background: linear-gradient(to bottom, rgba(255, 220, 50, 0.5), rgba(200, 150, 0, 0.6));
+    background: linear-gradient(to bottom, rgba(100, 200, 255, 0.4), rgba(50, 150, 255, 0.5));
 }
 
+.liquid.hydrogen,
 .liquid.indicator {
-    background: linear-gradient(to bottom, rgba(200, 50, 255, 0.5), rgba(150, 0, 200, 0.6));
+    background: linear-gradient(to bottom, rgba(255, 200, 255, 0.4), rgba(220, 150, 255, 0.5));
 }
 
 /* Pour animation */

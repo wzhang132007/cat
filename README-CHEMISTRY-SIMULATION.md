@@ -16,11 +16,15 @@ A minimalist, interactive chemistry simulation featuring six transparent glass b
 2. **Base** - Blue liquid with alkaline properties
 3. **Salt** - Green liquid representing ionic compounds
 4. **Water** - Clear liquid as universal solvent
-5. **Organic** - Yellow liquid representing organic compounds
-6. **Indicator** - Purple liquid for pH detection
+5. **Oxygen** - Light blue gas dissolved in liquid
+6. **Hydrogen** - Pink/purple gas dissolved in liquid
+
+### Special Reaction
+**💥 HYDROGEN + OXYGEN = EXPLOSIVE COMBUSTION 💥**
+When hydrogen and oxygen are mixed together, they create a massive explosive reaction producing water with a huge energy release! This is one of the most powerful reactions in chemistry (2H₂ + O₂ → 2H₂O + Energy).
 
 ### Interaction Flow
-1. **Select a Solution**: Click on any solution from the panel (Acid, Base, Salt, Water, Organic, Indicator)
+1. **Select a Solution**: Click on any solution from the panel (Acid, Base, Salt, Water, Oxygen, Hydrogen)
    - Selected solution highlights with a blue glow
 
 2. **Fill Beakers**: Click on empty beakers to fill them with the selected solution
@@ -37,14 +41,13 @@ A minimalist, interactive chemistry simulation featuring six transparent glass b
    - Reaction outcome depends on the solution combination
 
 5. **Chemical Reactions**: Different solution combinations produce varied outcomes:
+   - **💥 EXPLOSIVE COMBUSTION** (Hydrogen + Oxygen): MASSIVE explosion creating water!
    - **Neutralization** (Acid + Base): Color change reaction
+   - **Oxidation Reactions**: Oxygen transfer with color changes
+   - **Reduction Reactions**: Electron transfer reactions
    - **Exothermic Reactions**: Energy burst with heat release
    - **Gas Evolution**: Vigorous energy burst effect
    - **Precipitation**: Color change with solid formation
-   - **Phase Separation**: Calm reaction showing immiscibility
-   - **Saponification** (Base + Organic): Soap formation with energy release
-   - **Esterification** (Acid + Organic): Ester formation with color change
-   - **Color Changes**: Indicator reactions showing pH changes
    - **No Reaction**: Subtle ripple effect
 
 6. **Reset**: Clear all selections and empty all beakers to start fresh
@@ -66,12 +69,15 @@ Simply open `chemistry-simulation.html` in a modern web browser (Chrome, Firefox
 
 ## How It Works
 
-1. Select a solution type (Acid, Base, Salt, Water, Organic, or Indicator)
+1. Select a solution type (Acid, Base, Salt, Water, Oxygen, or Hydrogen)
 2. Click empty beakers to fill them with the selected solution
 3. Click two filled beakers to select them for mixing
 4. Click "Mix Selected Beakers"
 5. Watch the reaction based on the chemical combination
-6. Click "Reset" to empty all beakers and start over
+   - **Try mixing Hydrogen + Oxygen for an EXPLOSIVE reaction!** 💥
+6. The result appears as a new beaker in the Result Zone
+7. You can mix result beakers with other solutions for more experiments!
+8. Click "Reset All" to empty all beakers and start over
 
 ## Reaction Matrix
 
