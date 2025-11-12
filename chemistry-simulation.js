@@ -302,35 +302,122 @@ class ChemistrySimulation {
     }
 
     async explosiveCombustion(containers) {
-        // Special dramatic explosion for hydrogen + oxygen
+        // ULTRA DRAMATIC explosion for hydrogen + oxygen
+
+        // Add screen shake
+        document.body.classList.add('explosion-shake');
+
+        // Create flash overlay
+        const flash = document.createElement('div');
+        flash.classList.add('flash-overlay');
+        document.body.appendChild(flash);
+
+        setTimeout(() => flash.remove(), 800);
+
         containers.forEach(container => {
             container.classList.add('energy-burst');
+
+            // Add crack effect to beaker
+            const glass = container.querySelector('.beaker-glass');
+            if (glass) {
+                glass.classList.add('cracked');
+                setTimeout(() => glass.classList.remove('cracked'), 1200);
+            }
         });
 
-        // Create massive particle burst
-        containers.forEach(container => {
+        // Create MASSIVE multi-wave particle burst
+        containers.forEach((container, index) => {
             const rect = container.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            // More particles for a bigger explosion
-            this.createParticleBurst(centerX, centerY, 40);
+            // First wave - immediate massive burst
+            this.createParticleBurst(centerX, centerY, 80);
+
+            // Create shockwave
+            this.createShockwave(centerX, centerY);
+
+            // Second wave - delayed
+            setTimeout(() => {
+                this.createParticleBurst(centerX, centerY, 60);
+                this.createShockwave(centerX, centerY);
+            }, 150);
+
+            // Third wave - final burst
+            setTimeout(() => {
+                this.createParticleBurst(centerX, centerY, 40);
+            }, 300);
+
+            // Add debris/smoke particles
+            this.createDebrisParticles(centerX, centerY, 30);
         });
 
         this.resultMessage.textContent = '💥💥💥 EXPLOSIVE COMBUSTION - H₂ + O₂ → H₂O + ENERGY! 💥💥💥';
         this.resultMessage.style.color = '#e74c3c';
         this.resultMessage.style.fontWeight = 'bold';
         this.resultMessage.style.fontSize = '1.4rem';
+        this.resultMessage.style.textShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
 
-        await this.delay(800);
+        await this.delay(1000);
 
         containers.forEach(container => {
             container.classList.remove('energy-burst');
         });
 
+        document.body.classList.remove('explosion-shake');
+
         // Reset message styling
         this.resultMessage.style.fontWeight = '400';
         this.resultMessage.style.fontSize = '1.2rem';
+        this.resultMessage.style.textShadow = 'none';
+    }
+
+    createShockwave(centerX, centerY) {
+        const shockwave = document.createElement('div');
+        shockwave.classList.add('shockwave');
+        shockwave.style.left = `${centerX - 25}px`;
+        shockwave.style.top = `${centerY - 25}px`;
+        document.body.appendChild(shockwave);
+
+        setTimeout(() => shockwave.remove(), 800);
+    }
+
+    createDebrisParticles(centerX, centerY, count) {
+        for (let i = 0; i < count; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // Random angle and distance for debris
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 100 + Math.random() * 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                // Larger debris particles
+                const size = 12 + Math.random() * 8;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+
+                // Smoke/debris colors (gray, black, orange)
+                const debrisColors = [
+                    'radial-gradient(circle, #666 0%, #333 100%)',
+                    'radial-gradient(circle, #999 0%, #555 100%)',
+                    'radial-gradient(circle, #ff8800 0%, #ff4400 100%)',
+                    'radial-gradient(circle, #ffaa00 0%, #ff6600 100%)'
+                ];
+                particle.style.background = debrisColors[Math.floor(Math.random() * debrisColors.length)];
+
+                this.particleContainer.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 800);
+            }, i * 20);
+        }
     }
 
     async energyBurstReaction(containers, message) {
@@ -556,26 +643,70 @@ class ChemistrySimulation {
         const colorChangeReactions = ['color-change', 'neutralization', 'esterification', 'precipitation', 'oxidation', 'reduction'];
 
         if (reaction === 'explosive-combustion') {
-            // MASSIVE explosion for hydrogen + oxygen
+            // ULTRA MASSIVE explosion for hydrogen + oxygen result beaker
+
+            // Add screen shake
+            document.body.classList.add('explosion-shake');
+
+            // Create flash overlay
+            const flash = document.createElement('div');
+            flash.classList.add('flash-overlay');
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 800);
+
             beakerContainer.classList.add('exploding');
 
-            // Create HUGE particle burst
+            // Add crack effect
+            const glass = beakerContainer.querySelector('.beaker-glass');
+            if (glass) {
+                glass.classList.add('cracked');
+                setTimeout(() => glass.classList.remove('cracked'), 1500);
+            }
+
+            // Get position
             const rect = beakerContainer.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            this.createParticleBurst(centerX, centerY, 50);
+
+            // Multiple waves of MASSIVE explosions
+            // Wave 1 - Immediate huge burst
+            this.createParticleBurst(centerX, centerY, 100);
+            this.createShockwave(centerX, centerY);
+
+            // Wave 2 - Secondary explosion
+            setTimeout(() => {
+                this.createParticleBurst(centerX, centerY, 80);
+                this.createShockwave(centerX, centerY);
+            }, 200);
+
+            // Wave 3 - Tertiary explosion
+            setTimeout(() => {
+                this.createParticleBurst(centerX, centerY, 60);
+                this.createShockwave(centerX, centerY);
+            }, 400);
+
+            // Wave 4 - Final burst
+            setTimeout(() => {
+                this.createParticleBurst(centerX, centerY, 40);
+            }, 600);
+
+            // Massive debris cloud
+            this.createDebrisParticles(centerX, centerY, 50);
 
             this.resultMessage.textContent = '💥💥💥 EXPLOSIVE COMBUSTION - Water Formed with MASSIVE Energy Release! 💥💥💥';
             this.resultMessage.style.color = '#e74c3c';
             this.resultMessage.style.fontWeight = 'bold';
             this.resultMessage.style.fontSize = '1.4rem';
+            this.resultMessage.style.textShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
 
-            await this.delay(1200);
+            await this.delay(1500);
             beakerContainer.classList.remove('exploding');
+            document.body.classList.remove('explosion-shake');
 
             // Reset message styling
             this.resultMessage.style.fontWeight = '400';
             this.resultMessage.style.fontSize = '1.2rem';
+            this.resultMessage.style.textShadow = 'none';
         } else if (explosiveReactions.includes(reaction)) {
             // Explosion animation
             beakerContainer.classList.add('exploding');
